@@ -125,12 +125,37 @@ WHERE e.Id NOT IN (
 		AND ce.UnassignDate IS NULL
 ) ORDER BY e.LastName --Added this order by and it worked
 
+--14 ANDY's VERSION List all employees who do not have computers.
+
+SELECT e.*
+FROM Employee e
+LEFT JOIN ComputerEmployee ce ON e.Id = ce.EmployeeId 
+WHERE ce.id is null
+or e.id in (
+	SELECT ce.EmployeeId 
+	FROM ComputerEmployee ce
+	WHERE ce.UnassignDate IS NOT NULL
+		AND ce.EmployeeId NOT in (
+					SELECT ce.EmployeeId
+					FROM ComputerEmployee ce
+					WHERE ce.UnassignDate IS NOT NULL
+					)
+
+
+
 --15 List all employees along with their current computer information make and manufacturer combined 
 --into a field entitled ComputerInfo. If they do not have a computer, this field should say "N/A".
 
 SELECT e.FirstName + ' ' + e.LastName AS Employees, ISNULL(c.Manufacturer + ' ' + c.Make, 'N/A') AS ComputerInfo
 FROM Employee e 
 LEFT JOIN ComputerEmployee ce ON e.Id = ce.EmployeeId
+LEFT JOIN Computer c ON ce.ComputerId = c.Id
+
+--15 Andy's version CORRECT VERSION
+SELECT e.FirstName, e.LastName, 
+	   ISNULL(c.Make + ' ' + c.Manufacturer, 'N/A') AS ComputerInfo
+FROM Employee e
+LEFT JOIN ComputerEmployee ce ON e.Id = ce.EmployeeId AND ce.UnassignDate IS NULL
 LEFT JOIN Computer c ON ce.ComputerId = c.Id
 
 --16 List all computers that were purchased before July 2019 that are have not been decommissioned.
@@ -159,6 +184,24 @@ FROM
 Product p
 JOIN Customer c ON p.CustomerId = c.Id
 ORDER BY p.Price DESC;
+
+--20
+
+--21 Find the name of the customer who has made the most purchases (most orders) THERE ARE TWO PEOPLE
+SELECT c.FirstName, c.LastName, COUNT(o.customerId) AS OrdersPlaced
+FROM Customer c
+LEFT JOIN [Order] o ON c.id = o.CustomerId
+GROUP BY c.FirstName, c.LastName
+ORDER BY OrdersPlaced DESC
+	--customer who has bought the most products
+	SELECT top 1 with ties c.FirstName, c.LastName, COUNT(o.customerId) AS ProductsPurchased
+	FROM Customer c
+	LEFT JOIN [Order] o ON c.id = o.CustomerId
+	LEFT JOIN OrderProduct op ON o.id = op.OrderId
+	GROUP BY c.FirstName, c.LastName
+	ORDER BY ProductsPurchased DESC
+
+
 
 
 
