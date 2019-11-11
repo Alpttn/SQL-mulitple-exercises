@@ -96,7 +96,7 @@ SELECT * FROM Employee
 SELECT * FROM Computer
 SELECT * FROM ComputerEmployee
 
-
+--trying it with NOT EXISTS
 SELECT e.Id, e.FirstName, e.LastName
 FROM Employee e LEFT JOIN ComputerEmployee ce ON e.Id = ce.EmployeeId
 WHERE
@@ -123,8 +123,55 @@ WHERE e.Id NOT IN (
 	LEFT JOIN ComputerEmployee ce ON e.Id = ce.EmployeeId
 	WHERE ce.ComputerId IS NOT NULL
 		AND ce.UnassignDate IS NULL
-)
-										
+) ORDER BY e.LastName --Added this order by and it worked
 
+--15 List all employees along with their current computer information make and manufacturer combined 
+--into a field entitled ComputerInfo. If they do not have a computer, this field should say "N/A".
+
+SELECT e.FirstName + ' ' + e.LastName AS Employees, ISNULL(c.Manufacturer + ' ' + c.Make, 'N/A') AS ComputerInfo
+FROM Employee e 
+LEFT JOIN ComputerEmployee ce ON e.Id = ce.EmployeeId
+LEFT JOIN Computer c ON ce.ComputerId = c.Id
+
+--16 List all computers that were purchased before July 2019 that are have not been decommissioned.
+SELECT 
+    Id, Manufacturer + ' ' + Make AS ComputersBoughtBeforeJuly2019StillInUse
+FROM
+    Computer
+WHERE PurchaseDate < '2019-07-01'
+AND DecomissionDate IS NULL
+ORDER BY PurchaseDate DESC;
+
+--17 List all employees along with the total number of computers they have ever had.
+SELECT DISTINCT e.Id, e.FirstName, e.LastName, COUNT(ComputerId) NumOfComputers
+FROM Employee e 
+LEFT JOIN ComputerEmployee ce ON e.Id = ce.EmployeeId
+GROUP BY e.Id, e.FirstName,e.LastName
+
+--18 List the number of customers using each payment type
+SELECT pt.Name, COUNT(c.Id)
+FROM PaymentType pt LEFT JOIN Customer c ON pt.Id = c.Id
+GROUP BY pt.Name
+
+--19 List the 10 most expensive products and the names of the seller
+SELECT TOP 10 p.Title, p.Price, c.FirstName + ' ' + c.LastName AS SELLER
+FROM 
+Product p
+JOIN Customer c ON p.CustomerId = c.Id
+ORDER BY p.Price DESC;
+
+
+
+
+
+
+
+
+
+
+
+
+										
+										
 
 
