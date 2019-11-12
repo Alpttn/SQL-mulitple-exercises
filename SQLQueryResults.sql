@@ -142,7 +142,6 @@ or e.id in (
 					)
 
 
-
 --15 List all employees along with their current computer information make and manufacturer combined 
 --into a field entitled ComputerInfo. If they do not have a computer, this field should say "N/A".
 
